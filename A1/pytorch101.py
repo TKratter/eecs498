@@ -347,7 +347,8 @@ def make_one_hot(x: List[int]) -> Tensor:
     #                      TODO: Implement this function                     #
     ##########################################################################
     # Replace "pass" statement with your code
-    pass
+    y = torch.zeros((len(x), 1 + max(x)))
+    y[[i for i in range(len(x))], x] = 1
     ##########################################################################
     #                            END OF YOUR CODE                            #
     ##########################################################################
@@ -384,7 +385,7 @@ def sum_positive_entries(x: Tensor) -> Tensor:
     #                      TODO: Implement this function                     #
     ##########################################################################
     # Replace "pass" statement with your code
-    pass
+    pos_sum = x[x > 0].sum()
     ##########################################################################
     #                            END OF YOUR CODE                            #
     ##########################################################################
@@ -415,7 +416,7 @@ def reshape_practice(x: Tensor) -> Tensor:
     #                      TODO: Implement this function                     #
     ##########################################################################
     # Replace "pass" statement with your code
-    pass
+    y = x.reshape(2, 3, 4).permute(1, 0, 2).reshape(3, 8)
     ##########################################################################
     #                            END OF YOUR CODE                            #
     ##########################################################################
@@ -454,7 +455,8 @@ def zero_row_min(x: Tensor) -> Tensor:
     #                      TODO: Implement this function                     #
     ##########################################################################
     # Replace "pass" statement with your code
-    pass
+    y = x.clone()
+    y[[i for i in range(x.shape[0])], x.argmin(dim=1)] = 0
     ##########################################################################
     #                            END OF YOUR CODE                            #
     ##########################################################################
@@ -510,7 +512,11 @@ def batched_matrix_multiply_loop(x: Tensor, y: Tensor) -> Tensor:
     #                      TODO: Implement this function                      #
     ###########################################################################
     # Replace "pass" statement with your code
-    pass
+    mm_list = []
+    for b in range(x.shape[0]):
+        mm_list.append(x[b].mm(y[b]))
+
+    z = torch.stack(mm_list)
     ###########################################################################
     #                           END OF YOUR CODE                              #
     ###########################################################################
@@ -541,7 +547,7 @@ def batched_matrix_multiply_noloop(x: Tensor, y: Tensor) -> Tensor:
     #                      TODO: Implement this function                      #
     ###########################################################################
     # Replace "pass" statement with your code
-    pass
+    z = x.bmm(y)
     ###########################################################################
     #                            END OF YOUR CODE                             #
     ###########################################################################
@@ -575,8 +581,9 @@ def normalize_columns(x: Tensor) -> Tensor:
     ##########################################################################
     #                      TODO: Implement this function                     #
     ##########################################################################
-    # Replace "pass" statement with your code
-    pass
+    mu = x.mean(axis=0, keepdims=True)
+    sigma = torch.sqrt(((x - mu) ** 2).sum(axis=0, keepdims=True) / (x.shape[1] - 1))
+    y = (x - mu) / sigma
     ##########################################################################
     #                            END OF YOUR CODE                            #
     ##########################################################################
