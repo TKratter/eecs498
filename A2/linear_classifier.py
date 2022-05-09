@@ -506,24 +506,19 @@ def softmax_loss_naive(
     num_classes = W.shape[1]
     batch_size = X.shape[0]
 
-    probs = torch.zeros((batch_size, num_classes))
-
-    unnormalized_log_probs = X.mm(W)
-
-    # unnormalized_log_probs[torch.arange(len(y)), y] += 1e12
-    # for numeric stability
-    unnormalized_log_probs -= unnormalized_log_probs.max(dim=-1, keepdims=True)[0]
-
     for i in range(batch_size):
-        log_probs_sum = torch.exp(unnormalized_log_probs[i, :]).sum()
+        unnormalized_log_probs = W.t() @ X[i]
+        # for numerical stability
+        unnormalized_log_probs -= unnormalized_log_probs.max()
+        log_probs_sum = torch.exp(unnormalized_log_probs).sum()
+        probs = torch.exp(unnormalized_log_probs) / log_probs_sum
         for j in range(num_classes):
-            probs[i, j] = torch.exp(unnormalized_log_probs[i, j]) / log_probs_sum
             if y[i] == j:
-                dW[:, j] += (probs[i, j] - 1) * X[i]
+                dW[:, j] += (probs[j] - 1) * X[i]
             else:
-                dW[:, j] += probs[i, j] * X[i]
+                dW[:, j] += probs[j] * X[i]
 
-        loss += - torch.log(probs[i, y[i]])
+        loss += - torch.log(probs[y[i]])
 
     loss /= batch_size
     loss += reg * torch.sum(W * W)
@@ -558,7 +553,25 @@ def softmax_loss_vectorized(
     # regularization!                                                           #
     #############################################################################
     # Replace "pass" statement with your code
-    pass
+    num_classes = W.shape[1]
+    batch_size = X.shape[0]
+    unnormalized_log_probs = X.mm(W)
+
+    # for numeric stability
+    unnormalized_log_probs -= unnormalized_log_probs.max(dim=-1, keepdims=True)[0]
+    log_probs_sum = torch.exp(unnormalized_log_probs).sum(dim=-1).view(-1, 1)
+
+    probs = torch.exp(unnormalized_log_probs) / log_probs_sum
+
+    loss = - torch.log(probs[torch.arange(len(y)), y]).mean()
+
+    probs[torch.arange(len(y)), y] -= 1
+    dW += X.t() @ probs / batch_size
+
+    loss += reg * torch.sum(W * W)
+
+    dW += 2 * reg * W
+
     #############################################################################
     #                          END OF YOUR CODE                                 #
     #############################################################################
@@ -587,7 +600,8 @@ def softmax_get_search_params():
     # classifier.                                                             #
     ###########################################################################
     # Replace "pass" statement with your code
-    pass
+    learning_rates = [10 ** (i - 3) for i in range(5)]
+    regularization_strengths = [10 ** (i - 3) for i in range(5)]
     ###########################################################################
     #                           END OF YOUR CODE                              #
     ###########################################################################

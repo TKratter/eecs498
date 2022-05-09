@@ -43,7 +43,6 @@ def grad_check_sparse(f, x, analytic_grad, num_checks=10, h=1e-7):
         rel_error_bot = abs(grad_numerical) + abs(grad_analytic) + 1e-12
         rel_error = rel_error_top / rel_error_bot
         msg = "numerical: %f analytic: %f, relative error: %e"
-        print(grad_numerical == 0)
         print(msg % (grad_numerical, grad_analytic, rel_error))
 
 
