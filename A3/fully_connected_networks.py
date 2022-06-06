@@ -39,7 +39,7 @@ class Linear(object):
         # You will need to reshape the input into rows.                      #
         ######################################################################
         # Replace "pass" statement with your code
-        out = x.view(x.shape[0], -1) @ w + b.view(1, -1)
+        out = x.reshape(x.shape[0], -1) @ w + b.view(1, -1)
         ######################################################################
         #                        END OF YOUR CODE                            #
         ######################################################################
@@ -71,7 +71,7 @@ class Linear(object):
         ##################################################
         # Replace "pass" statement with your code
         dx = (dout @ w.t()).view(*x.shape)
-        dw = x.view(N, D).t() @ dout
+        dw = x.reshape(N, D).t() @ dout
         db = dout.sum(dim=0)
         ##################################################
         #                END OF YOUR CODE                #
