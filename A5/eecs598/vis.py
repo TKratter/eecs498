@@ -86,6 +86,7 @@ def detection_visualizer(img, idx_to_class, bbox=None, pred=None):
     if pred is not None:
         for bbox_idx in range(pred.shape[0]):
             one_bbox = pred[bbox_idx][:4]
+            one_bbox = [int(pixel) for pixel in one_bbox]
             cv2.rectangle(img_copy, (one_bbox[0], one_bbox[1]), (one_bbox[2],
                         one_bbox[3]), (0, 255, 0), 2)
             
